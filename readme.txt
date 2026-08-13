@@ -2,7 +2,7 @@
 Contributors: alimuzzamanalim
 Tags: duplicate post, duplicate page, clone, copy, draft
 Requires at least: 6.6
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.2
 License: GPLv2 or later
