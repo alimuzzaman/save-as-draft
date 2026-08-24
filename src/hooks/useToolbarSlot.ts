@@ -7,49 +7,51 @@
 import { useState, useEffect } from '@wordpress/element';
 
 export const useToolbarSlot = ( enabled: boolean ): HTMLElement | null => {
-    const [ slot, setSlot ] = useState< HTMLElement | null >( null );
+	const [ slot, setSlot ] = useState< HTMLElement | null >( null );
 
-    useEffect( () => {
-        if ( ! enabled ) {
-            return undefined;
-        }
+	useEffect( () => {
+		if ( ! enabled ) {
+			return undefined;
+		}
 
-        let node: HTMLElement | undefined;
-        let cancelled = false;
+		let node: HTMLElement | undefined;
+		let cancelled = false;
 
-        const attach = (): boolean => {
-            const settings = document.querySelector( '.editor-header__settings' );
-            if ( ! settings || cancelled ) {
-                return false;
-            }
-            node = document.createElement( 'div' );
-            node.className = 'clone-post-unsaved-changes__toolbar-slot';
-            node.style.display = 'flex';
-            node.style.alignItems = 'center';
-            settings.prepend( node ); // sit before the native Save/Publish buttons
-            setSlot( node );
-            return true;
-        };
+		const attach = (): boolean => {
+			const settings = document.querySelector(
+				'.editor-header__settings'
+			);
+			if ( ! settings || cancelled ) {
+				return false;
+			}
+			node = document.createElement( 'div' );
+			node.className = 'clone-post-unsaved-changes__toolbar-slot';
+			node.style.display = 'flex';
+			node.style.alignItems = 'center';
+			settings.prepend( node ); // sit before the native Save/Publish buttons
+			setSlot( node );
+			return true;
+		};
 
-        // The header mounts asynchronously, so poll briefly until it appears.
-        let intervalId: ReturnType< typeof setInterval > | undefined;
-        if ( ! attach() ) {
-            intervalId = setInterval( () => {
-                if ( attach() ) {
-                    clearInterval( intervalId );
-                }
-            }, 300 );
-        }
+		// The header mounts asynchronously, so poll briefly until it appears.
+		let intervalId: ReturnType< typeof setInterval > | undefined;
+		if ( ! attach() ) {
+			intervalId = setInterval( () => {
+				if ( attach() ) {
+					clearInterval( intervalId );
+				}
+			}, 300 );
+		}
 
-        return () => {
-            cancelled = true;
-            if ( intervalId ) {
-                clearInterval( intervalId );
-            }
-            node?.remove();
-            setSlot( null );
-        };
-    }, [ enabled ] );
+		return () => {
+			cancelled = true;
+			if ( intervalId ) {
+				clearInterval( intervalId );
+			}
+			node?.remove();
+			setSlot( null );
+		};
+	}, [ enabled ] );
 
-    return slot;
+	return slot;
 };

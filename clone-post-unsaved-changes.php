@@ -3,7 +3,7 @@
  * Plugin Name:       Clone Post with Unsaved Changes to a Draft
  * Plugin URI:        https://wordpress.org/plugins/clone-post-unsaved-changes/
  * Description:       Adds a "Save As" button to the block editor that clones the current post or page into a new draft.
- * Version:           1.0.2
+ * Version:           1.0.3
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Alimuzzaman Alim
@@ -20,7 +20,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/rest-controller.php';
+
 add_action( 'enqueue_block_editor_assets', 'clone_post_unsaved_changes_enqueue_block_editor_assets' );
+add_action( 'elementor/editor/after_enqueue_scripts', 'clone_post_unsaved_changes_enqueue_elementor_assets' );
 
 /**
  * Enqueue the compiled block-editor bundle and register its JS translations.
@@ -54,4 +57,55 @@ function clone_post_unsaved_changes_enqueue_block_editor_assets() {
 		'clone-post-unsaved-changes',
 		plugin_dir_path( __FILE__ ) . 'languages'
 	);
+}
+
+/**
+ * Enqueue the narrowly version-gated Elementor Save As control.
+ *
+ * @return void
+ */
+function clone_post_unsaved_changes_enqueue_elementor_assets() {
+	$script = plugin_dir_path( __FILE__ ) . 'assets/elementor-editor.js';
+	$style  = plugin_dir_path( __FILE__ ) . 'assets/elementor-editor.css';
+
+	if ( ! file_exists( $script ) || ! defined( 'ELEMENTOR_VERSION' ) || '4.2.3' !== ELEMENTOR_VERSION ) {
+		return;
+	}
+	$asset_version = (string) filemtime( $script );
+	if ( '' === $asset_version ) {
+		$asset_version = '1.0.3';
+	}
+
+	wp_enqueue_script(
+		'clone-post-unsaved-changes-elementor',
+		plugins_url( 'assets/elementor-editor.js', __FILE__ ),
+		array( 'elementor-editor' ),
+		$asset_version,
+		true
+	);
+	wp_localize_script(
+		'clone-post-unsaved-changes-elementor',
+		'clonePostUnsavedChangesElementor',
+		array(
+			'endpoint'              => esc_url_raw( rest_url( 'clone-post-unsaved-changes/v1/drafts' ) ),
+			'nonce'                 => wp_create_nonce( 'wp_rest' ),
+			'copyText'              => __( 'Save As', 'clone-post-unsaved-changes' ),
+			'dialogTitle'           => __( 'Save as draft', 'clone-post-unsaved-changes' ),
+			'draftTitleLabel'       => __( 'Draft title', 'clone-post-unsaved-changes' ),
+			'cancelText'            => __( 'Cancel', 'clone-post-unsaved-changes' ),
+			'errorText'             => __( 'Save As failed. The original document was not changed.', 'clone-post-unsaved-changes' ),
+			'snapshotErrorText'      => __( 'This Elementor document cannot be copied safely.', 'clone-post-unsaved-changes' ),
+			'untitledText'          => __( 'Untitled', 'clone-post-unsaved-changes' ),
+			'copySuffix'            => __( ' (Copy)', 'clone-post-unsaved-changes' ),
+		)
+	);
+
+	if ( file_exists( $style ) ) {
+		wp_enqueue_style(
+			'clone-post-unsaved-changes-elementor',
+			plugins_url( 'assets/elementor-editor.css', __FILE__ ),
+			array(),
+			$asset_version
+		);
+	}
 }

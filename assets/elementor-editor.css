@@ -1,0 +1,35 @@
+.cpuc-elementor-save-as {
+	bottom: 16px;
+	position: fixed;
+	right: 16px;
+	z-index: 100000;
+}
+
+.cpuc-elementor-modal {
+	border: 0;
+	border-radius: 4px;
+	max-width: 360px;
+	padding: 24px;
+}
+
+.cpuc-elementor-modal::backdrop {
+	background: rgb(0 0 0 / 55%);
+}
+
+.cpuc-elementor-modal input {
+	display: block;
+	margin-top: 8px;
+	width: 100%;
+}
+
+.cpuc-elementor-modal menu {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin: 24px 0 0;
+	padding: 0;
+}
+
+.cpuc-elementor-modal [data-cpuc-error] {
+	color: #b32d2e;
+}

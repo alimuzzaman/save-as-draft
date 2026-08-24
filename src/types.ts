@@ -2,26 +2,37 @@
  * Shared types for the Clone Post with Unsaved Changes plugin.
  */
 
-// A WordPress REST post object. Only `id` is relied on directly; the rest of
-// the response is left open.
-export interface RestPost {
-    id: number;
-    [ key: string ]: unknown;
+export interface TaxonomyOverlay {
+	[ restBase: string ]: number[];
 }
 
-// The payload POSTed to the REST API to create the draft copy. Most fields are
-// passed straight through from the current post's edited attributes, so they
-// are typed loosely.
-export interface DraftPayload {
-    status: 'draft';
-    title: string;
-    content: string;
-    excerpt: string;
-    featured_media: number;
-    comment_status: string;
-    ping_status: string;
-    format: string;
-    template: string;
-    categories: number[];
-    tags: number[];
+export interface EditedPostOverlay {
+	title: string;
+	content: string;
+	excerpt: unknown;
+	featured_media: unknown;
+	comment_status: unknown;
+	ping_status: unknown;
+	format: unknown;
+	sticky: unknown;
+	template: unknown;
+	parent: unknown;
+	menu_order: unknown;
+	taxonomies: TaxonomyOverlay;
+	meta?: Record< string, unknown >;
+}
+
+export interface DraftRequest {
+	source_id: number;
+	request_id: string;
+	copy_title: string;
+	editor: 'block';
+	edited: EditedPostOverlay;
+}
+
+export interface DraftResponse {
+	id: number;
+	edit_url: string;
+	editor: 'core' | 'elementor';
+	adapter: 'core' | 'woocommerce' | 'elementor';
 }

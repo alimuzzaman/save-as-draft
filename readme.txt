@@ -4,7 +4,7 @@ Tags: duplicate post, duplicate page, clone, copy, draft
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ Duplicate or clone any post or page into a new draft — including unsaved chang
 
 **Clone Post with Unsaved Changes to a Draft** adds a **Save As** button to the WordPress block editor. One click copies the post you are editing — including its unsaved changes — into a brand-new draft and opens it, so you can branch, version, or template your content without manually duplicating anything.
 
-It works for posts, pages, and any public custom post type, and copies the title, content, excerpt, featured image, taxonomies, discussion settings, format, template, and post meta.
+It works with supported Gutenberg posts, pages, and public REST-enabled custom post types. The plugin copies saved core fields and registered taxonomies, then applies supported unsaved block-editor changes. Copies are always drafts. Elementor 4.2.3 post/page documents have a separate, version-pinned adapter that mirrors Elementor's persistent document defaults, captures the unsaved editor snapshot before any save, verifies that Elementor persisted the complete snapshot, and writes it only to the new draft; other versions and document types fail closed. WooCommerce products use WooCommerce's native duplicate workflow only when a block-editor integration invokes the server adapter; classic Woo product screens, product variations, and unsaved Woo-specific fields remain outside this contract.
 
 = Features =
 
@@ -26,11 +26,12 @@ It works for posts, pages, and any public custom post type, and copies the title
 * Press **Ctrl/⌘ + Alt + S** to open Save As without reaching for the mouse.
 * Hide the toolbar and/or sidebar button from the dialog; the **⋮** menu item always stays available.
 * Copies are always created as **drafts**, so you never overwrite the original.
+* Uses a dedicated authenticated endpoint with capability checks and request-id idempotency.
 * Fully translatable (proper `wp_set_script_translations` integration).
 
 = How it works =
 
-The plugin reads the current editor state (including unsaved edits) and creates a new draft through the WordPress REST API, then redirects you to the new draft's edit screen. Nothing is changed on the original post.
+The plugin sends a constrained snapshot of the current block-editor state to its own authenticated endpoint. The server reads the saved source post, creates a draft for the current user, then applies supported edits and redirects you to the new draft. Nothing is changed on the original post.
 
 == Installation ==
 
@@ -46,15 +47,19 @@ No. There is nothing to copy until a post has been saved at least once, so the b
 
 = Does it copy my unsaved changes? =
 
-Yes. The copy is built from the current editor state, so edits you have not saved yet are included in the new draft.
+Yes, for supported block-editor fields: title, content, excerpt, featured media, discussion settings, sticky state for posts, format, template, parent, menu order, REST taxonomies, and registered REST-visible meta. If another dirty field cannot be copied safely, Save As stops before creating a draft.
 
 = Does it work with pages and custom post types? =
 
-Yes. The REST route is derived from the current post type, so posts, pages, and public custom post types are all supported.
+Supported public post types must be available through the REST API and use the block editor. Attachments, autosaves, revisions, and trashed posts are not handled by the generic adapter. WooCommerce products require the native WooCommerce adapter and a block-editor integration; product variations and the standard classic Woo product editor remain unsupported. Custom post types that use Elementor require the separate Elementor adapter.
 
 = What gets copied? =
 
-Title, content, excerpt, featured image, categories and tags, discussion (comment/ping) settings, post format, page template, and post meta exposed to the REST API.
+Supported core post fields and registered taxonomies are copied, with current editor changes overlaid. The new draft belongs to the current user, has a fresh slug/guid, and does not inherit the source password, dates, status, or author. Sticky state is copied for posts, subject to WordPress's sticky capability. Featured media is reused by ID. Registered `show_in_rest` meta keys are copied after capability and operational-key checks; a site developer can narrow the exact set with the `clone_post_unsaved_changes_allowed_meta_keys` filter. WooCommerce product meta is handled only by WooCommerce's native CRUD adapter. The generic adapter does not directly copy files, attachments, comments, revisions, child records, custom tables, or plugin-owned external data.
+
+= Does it support Elementor or WooCommerce products? =
+
+Elementor 4.2.3 post/page documents use a separate, version-pinned adapter. Save As mirrors Elementor's persistent-setting defaults, captures the current document container settings and element tree without invoking Elementor's `save_builder`/autosave request, writes the frozen data to a new draft through Elementor's document API, verifies the draft status, persisted element/settings payload, and CSS generation, and checks that the source post, meta, and taxonomy relationships did not change. Other Elementor versions/document types fail closed. WooCommerce products use WooCommerce's own CRUD duplicate workflow for saved product data; unsaved product-specific fields and the normal classic product editor are not claimed as supported.
 
 = I hid both buttons — how do I get them back? =
 
@@ -74,6 +79,12 @@ Development happens on GitHub. Bug reports, feature requests, and pull requests 
 
 == Changelog ==
 
+= 1.0.3 =
+* Add WordPress 7.1 iframe-editor coverage for Save As, including unsaved title, content, and excerpt changes.
+* Support REST-enabled custom post types with registered REST-visible metadata and direct source-state checks.
+* Add version-pinned Elementor 4.2.3 and bounded WooCommerce native-duplication adapters.
+* Make retries idempotent, expire request records, and keep development files out of production archives.
+
 = 1.0.2 =
 * Prevent duplicate drafts when a Save As request fails for a reason unrelated to post meta.
 * New copies now start with a **(Copy)** title, making them easier to distinguish.
@@ -88,6 +99,9 @@ Development happens on GitHub. Bug reports, feature requests, and pull requests 
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Adds WordPress 7.1 iframe-editor coverage, bounded custom-post-type metadata cloning, Elementor/WooCommerce adapters, safer retries, and clean production packaging.
 
 = 1.0.2 =
 Improves Save As reliability with a default copy title, keyboard shortcut, and clearer confirmation when opening a new draft.

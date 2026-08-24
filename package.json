@@ -1,43 +1,59 @@
 {
-  "name": "clone-post-unsaved-changes",
-  "version": "1.0.2",
-  "description": "Adds a 'Save As' button to the WordPress block editor that clones the current post or page into a new draft.",
-  "author": "Alimuzzaman Alim (https://profiles.wordpress.org/alimuzzamanalim/)",
-  "license": "GPL-2.0-or-later",
-  "private": true,
-  "packageManager": "pnpm@10.17.1",
-  "keywords": [
-    "wordpress",
-    "wordpress-plugin",
-    "gutenberg",
-    "block-editor",
-    "save-as"
-  ],
-  "scripts": {
-    "start": "wp-scripts start",
-    "build": "wp-scripts build",
-    "format": "wp-scripts format",
-    "lint:js": "wp-scripts lint-js",
-    "lint:pkg-json": "wp-scripts lint-pkg-json",
-    "packages-update": "wp-scripts packages-update",
-    "plugin-zip": "wp-scripts plugin-zip && mv -f \"$npm_package_name.zip\" \"../$npm_package_name.zip\"",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@wordpress/api-fetch": "^7.12.0",
-    "@wordpress/components": "^28.12.0",
-    "@wordpress/data": "^10.12.0",
-    "@wordpress/editor": "^14.12.0",
-    "@wordpress/element": "^6.12.0",
-    "@wordpress/i18n": "^5.12.0",
-    "@wordpress/icons": "^10.12.0",
-    "@wordpress/plugins": "^7.12.0",
-    "@wordpress/scripts": "^30.5.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "@wordpress/browserslist-config": "^6.49.0",
-    "typescript": "^5.6.0"
-  }
+	"name": "clone-post-unsaved-changes",
+	"version": "1.0.3",
+	"description": "Adds a 'Save As' button to the WordPress block editor that clones the current post or page into a new draft.",
+	"author": "Alimuzzaman Alim (https://profiles.wordpress.org/alimuzzamanalim/)",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"packageManager": "pnpm@10.17.1",
+	"keywords": [
+		"wordpress",
+		"wordpress-plugin",
+		"gutenberg",
+		"block-editor",
+		"save-as"
+	],
+	"homepage": "https://wordpress.org/plugins/clone-post-unsaved-changes/",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/alimuzzaman/clone-post-unsaved-changes.git"
+	},
+	"bugs": "https://github.com/alimuzzaman/clone-post-unsaved-changes/issues",
+	"files": [
+		"assets",
+		"build",
+		"includes",
+		"languages",
+		"clone-post-unsaved-changes.php",
+		"readme.txt",
+		"LICENSE"
+	],
+	"dependencies": {
+		"@wordpress/api-fetch": "^7.12.0",
+		"@wordpress/components": "^28.12.0",
+		"@wordpress/data": "^10.12.0",
+		"@wordpress/editor": "^14.12.0",
+		"@wordpress/element": "^6.12.0",
+		"@wordpress/i18n": "^5.12.0",
+		"@wordpress/icons": "^10.12.0",
+		"@wordpress/plugins": "^7.12.0",
+		"@wordpress/scripts": "^30.5.1"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.49.0",
+		"@types/react": "^18.3.0",
+		"@types/react-dom": "^18.3.0",
+		"@wordpress/browserslist-config": "^6.49.0",
+		"typescript": "^5.6.0"
+	},
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:js": "wp-scripts lint-js",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip && zip -dq \"$npm_package_name.zip\" \"$npm_package_name/package.json\" \"$npm_package_name/README.md\" && mv -f \"$npm_package_name.zip\" \"../$npm_package_name.zip\"",
+		"typecheck": "tsc --noEmit"
+	}
 }
